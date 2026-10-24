@@ -23,7 +23,7 @@ class SweResult(BaseModel):
 
 
 SWE_SYSTEM_PROMPT = """You are an expert Minecraft Skript DSL systems developer.
-You write production-grade, highly performant, and secure .sk scripts for PaperMC servers.
+You write production-grade, highly performant, and secure .sk scripts for 1.21.5 PaperMC servers.
 
 ENVIRONMENT CONSTRAINTS:
 1. PURE VANILLA SKRIPT ONLY: No third-party addons are installed on this server (NO SkBee, NO SkQuery, NO sk-nbtee).
