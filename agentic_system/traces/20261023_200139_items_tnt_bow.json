@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-23T20:01:39.093664",
+  "player": "TheJack3215",
+  "action_type": "UPDATE",
+  "raw_prompt": "!update change the tnt bow, make it spawn 1000 primed tnt instead of just 1",
+  "target_scope": "items/tnt_bow.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the TNT Bow to spawn 1000 primed TNT entities upon impact instead of a single one.",
+  "usage_instructions": [
+    "Use /give-tnt-bow to receive the upgraded TNT Bow.",
+    "Shoot an arrow to spawn 1000 primed TNT at the impact location."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "WRITE",
+      "content": "on shoot:\n    if shooter is a player:\n        if name of shooter's tool is \"&cTNT Bow\":\n            set metadata \"is_tnt_arrow\" of projectile to true\n\non projectile hit:\n    if metadata \"is_tnt_arrow\" of projectile is true:\n        loop 1000 times:\n            spawn primed tnt at location of projectile\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots 1000 explosive TNT arrows.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "UPDATE",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_bow.sk"
+      ],
+      "candidate_events": [
+        "shoot"
+      ],
+      "intent_summary": "Modify the TNT bow to spawn 1000 primed TNT entities upon firing instead of a single one."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "Updated the projectile hit event to include a loop that spawns 1000 primed tnt entities at the location of the projectile. Used standard Skript loop syntax to ensure compatibility without external addons."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the TNT Bow to spawn 1000 primed TNT entities upon impact instead of a single one.",
+      "usage_instructions": [
+        "Use /give-tnt-bow to receive the upgraded TNT Bow.",
+        "Shoot an arrow to spawn 1000 primed TNT at the impact location."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@ TAG_RE = re.compile(r"<[^>]+>")
 
 # Syntax categories from docs.json to index for SWE retrieval
 SYNTAX_CATEGORIES = [
+    "events",
     "conditions",
     "effects",
     "expressions",

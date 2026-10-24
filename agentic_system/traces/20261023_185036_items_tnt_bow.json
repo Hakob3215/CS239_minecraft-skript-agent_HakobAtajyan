@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-10-23T18:50:36.138085",
+  "player": "TheJack3215",
+  "action_type": "CREATE",
+  "raw_prompt": "!create a new item. a bow that spawns primed tnt when the arrow lands",
+  "target_scope": "items/tnt_bow.sk",
+  "success": false,
+  "compiler_error": "[Skript] Reloading tnt_bow.sk...\nLine 3: (items\\tnt_bow.sk)\n    Can't compare 'if player's tool' with an item type\n    Line: if player's tool is a bow named \"&cTNT Bow\":\n \n[Skript] Encountered 1 error while reloading tnt_bow.sk! (114ms)",
+  "reviewer_feedback": null,
+  "usage_instructions": [],
+  "retry_count": 3,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "CREATE",
+      "content": "on shoot:\n    if shooter is a player:\n        if player's tool is a bow named \"&cTNT Bow\":\n            set metadata \"is_tnt_arrow\" of projectile to true\n\non projectile hit:\n    if metadata \"is_tnt_arrow\" of projectile is true:\n        spawn primed tnt at location of projectile\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots explosive TNT arrows.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "CREATE",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": true,
+      "files_loaded": [],
+      "candidate_events": [
+        "projectile_hit",
+        "shoot"
+      ],
+      "intent_summary": "Create a custom bow that spawns primed TNT at the location where an arrow lands."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "I used the 'on shoot' event to tag the arrow with metadata to ensure only arrows fired from the specific bow trigger the effect. The 'on projectile hit' event handles the spawning of the primed TNT at the impact location and removes the arrow entity to prevent further collisions."
+    },
+    {
+      "node": "reviewer",
+      "status": "COMPILATION_ERROR",
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ],
+      "error_trace": "[Skript] Reloading tnt_bow.sk...\nLine 2: (items\\tnt_bow.sk)\n    Can't compare 'if player's tool' with an item type\n    Line: if player's tool is bow named \"&cTNT Bow\":\n \n[Skript] Encountered 1 error while reloading tnt_bow.sk! (137ms)",
+      "retry_count": 1
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "The compiler error occurred because 'bow named \"&cTNT Bow\"' is an expression, not a literal item type. By checking 'if player's tool is a bow' first and then comparing the 'name of player's tool', we avoid the type mismatch. I used projectile metadata to track the specific arrow fired by the TNT bow to ensure only those arrows trigger the explosion."
+    },
+    {
+      "node": "reviewer",
+      "status": "COMPILATION_ERROR",
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ],
+      "error_trace": "[Skript] Reloading tnt_bow.sk...\nLine 2: (items\\tnt_bow.sk)\n    There's no player in an on shoot event.\n    Line: if player's tool is a bow:\n \n[Skript] Encountered 1 error while reloading tnt_bow.sk! (75ms)",
+      "retry_count": 2
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "The error occurred because 'player' is not available in the 'on shoot' event scope directly as the shooter. By using 'if shooter is a player', we safely identify the player and check their tool. We use metadata on the projectile to track which arrows are TNT-enabled, ensuring the effect only triggers for arrows fired from the specific bow."
+    },
+    {
+      "node": "reviewer",
+      "status": "COMPILATION_ERROR",
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ],
+      "error_trace": "[Skript] Reloading tnt_bow.sk...\nLine 3: (items\\tnt_bow.sk)\n    Can't compare 'if player's tool' with an item type\n    Line: if player's tool is a bow named \"&cTNT Bow\":\n \n[Skript] Encountered 1 error while reloading tnt_bow.sk! (114ms)",
+      "retry_count": 3
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-10-23T19:20:28.105257",
+  "player": "TheJack3215",
+  "action_type": "FIX",
+  "raw_prompt": "!fix the giant pig skript. get rid of the 'generic' in the command. mc 1.21 changed it to just minecraft:scale",
+  "target_scope": "mobs/giant_pig.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the giant pig spawning command to use the correct Minecraft 1.21 attribute syntax for scaling.",
+  "usage_instructions": [
+    "Use the command /spawnbigpig to summon a giant pig.",
+    "Requires operator permissions to execute the command."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "mobs/giant_pig.sk",
+      "action": "WRITE",
+      "content": "command /spawnbigpig:\n    permission: op\n    trigger:\n        spawn a pig at player\n        set {_pig} to last spawned entity\n        set max health of {_pig} to 100\n        heal {_pig}\n        set {_uuid} to uuid of {_pig}\n        execute console command \"attribute %{_uuid}% minecraft:scale base set 3\"\n        send \"&aSpawned a giant pig!\" to player"
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "FIX",
+      "target_scope": "mobs/giant_pig.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "mobs/giant_pig.sk"
+      ],
+      "candidate_events": [],
+      "intent_summary": "Update the giant pig script to replace the generic attribute with minecraft:scale for Minecraft 1.21 compatibility."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "mobs/giant_pig.sk"
+      ],
+      "rationale": "Updated the attribute command from 'minecraft:generic.scale' to 'minecraft:scale' to comply with Minecraft 1.21 attribute changes as requested."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the giant pig spawning command to use the correct Minecraft 1.21 attribute syntax for scaling.",
+      "usage_instructions": [
+        "Use the command /spawnbigpig to summon a giant pig.",
+        "Requires operator permissions to execute the command."
+      ],
+      "applied_files": [
+        "WRITE:mobs/giant_pig.sk"
+      ]
+    }
+  ]
+}

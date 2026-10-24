@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
+
 
 class FileMutation(BaseModel):
     """
@@ -9,39 +10,39 @@ class FileMutation(BaseModel):
         ...,
         description="Relative POSIX path from scripts root (e.g. 'combat/double_jump.sk' or 'spells/fireball.sk'). Must never contain '..'."
     )
-    action: str = Field(
+    action: Literal["CREATE", "WRITE", "DELETE"] = Field(
         ...,
-        description="Mutation type: must be 'WRITE' or 'DELETE'."
+        description="Mutation type: must be 'CREATE', 'WRITE', or 'DELETE'."
     )
     content: Optional[str] = Field(
-        ...,
-        description="UTF-8 Skript code buffer to write. Required if action is 'WRITE', None if 'DELETE'."
+        default="",
+        description="UTF-8 Skript code buffer to write. Required if action is 'WRITE' or 'CREATE', empty or None if 'DELETE'."
     )
 
 
 class AgentState(BaseModel):
     """
-    The shared state that each agent (Secretary, Swe, Reviewer) will have access to in LangGraph
+    The shared state that each agent (Secretary, SWE, Reviewer) accesses and mutates in LangGraph.
     """
 
     # INPUT FROM CHAT LOGGER
     raw_prompt: str = Field(
         ...,
-        description="The in-game chat trigger, e.g. 'create double jump boots'"
+        description="The in-game chat trigger, e.g. '!create double jump boots'"
     )
 
     # OUTPUT OF SECRETARY AGENT
-    action_type: str = Field(
+    action_type: Literal["CREATE", "UPDATE", "FIX"] = Field(
         default="CREATE",
-        description="Action Decision: 'CREATE', 'UPDATE', or 'FIX' "
+        description="Action Decision: 'CREATE', 'UPDATE', or 'FIX'"
     )
     target_scope: str = Field(
         default="",
-        description="The target directory or file, e.g. 'double_jump.sk' or 'items/spellbook/"
+        description="The target directory or file, e.g. 'double_jump.sk' or 'items/spellbook/'"
     )
     candidate_events: List[str] = Field(
         default_factory=list,
-        description="Matched Skript event IDs from data/event_manifest.json (e.g. ['EvtFlightToggle'])"
+        description="Matched Skript event IDs from data/event_manifest.json (e.g. ['flight_toggle'])"
     )
     workspace_context: Dict[str, str] = Field(
         default_factory=dict,
@@ -61,7 +62,15 @@ class AgentState(BaseModel):
     # OUTPUT OF REVIEWER AGENT
     compiler_error: Optional[str] = Field(
         default=None,
-        description="Console syntax errors caught by RCON during /skript reload"
+        description="Console syntax errors caught by RCON during /skript reload or semantic critique"
+    )
+    reviewer_feedback: Optional[str] = Field(
+        default=None,
+        description="Summary of code review findings or overview of applied changes"
+    )
+    usage_instructions: List[str] = Field(
+        default_factory=list,
+        description="In-game usage instructions broadcast to players (e.g., commands, items, mechanics)"
     )
     retry_count: int = Field(
         default=0,
@@ -71,6 +80,5 @@ class AgentState(BaseModel):
     # TRACE LOGGING
     traces: List[Dict[str, Any]] = Field(
         default_factory=list,
-        description="Auditing Steps to trace model thoughts and actions"
+        description="Auditing steps to trace model thoughts and node actions"
     )
-
