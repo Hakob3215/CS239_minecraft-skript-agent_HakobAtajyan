@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-25T20:38:05.252979",
+  "player": "TheJack3215",
+  "action_type": "UPDATE",
+  "raw_prompt": "!update change the tnt bow to only spawn 100 tnt",
+  "target_scope": "items/tnt_bow.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the TNT Bow to spawn exactly 100 TNT blocks upon impact instead of the previous amount.",
+  "usage_instructions": [
+    "Use /give-tnt-bow to receive the explosive bow (requires OP).",
+    "Shoot an arrow at a block to trigger the 100 TNT explosion."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "WRITE",
+      "content": "on shoot:\n    if shooter is a player:\n        if name of shooter's tool is \"&cTNT Bow\":\n            set metadata \"is_tnt_arrow\" of projectile to \"true\"\n\non projectile hit:\n    if metadata \"is_tnt_arrow\" of projectile is \"true\":\n        loop 100 times:\n            spawn primed tnt at location of projectile\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots 100 explosive TNT arrows.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "UPDATE",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_bow.sk"
+      ],
+      "candidate_events": [
+        "shoot"
+      ],
+      "intent_summary": "Limit the TNT bow to spawn exactly 100 TNT entities upon firing."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "Updated the loop count from 100000 to 100 to prevent server lag and fulfill the user request. Maintained the metadata-based identification system as it is the standard way to track projectiles in vanilla Skript without addons."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the TNT Bow to spawn exactly 100 TNT blocks upon impact instead of the previous amount.",
+      "usage_instructions": [
+        "Use /give-tnt-bow to receive the explosive bow (requires OP).",
+        "Shoot an arrow at a block to trigger the 100 TNT explosion."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ]
+    }
+  ]
+}

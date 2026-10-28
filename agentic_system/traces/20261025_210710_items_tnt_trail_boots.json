@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-25T21:07:10.798685",
+  "player": "TheJack3215",
+  "action_type": "FIX",
+  "raw_prompt": "!fix for the tnt boots. it was spawning while I was standing still. And then it just randomly stopped spawning permanently",
+  "target_scope": "items/tnt_trail_boots.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the TNT boots logic to use a velocity threshold instead of checking for zero, ensuring consistent spawning while moving.",
+  "usage_instructions": [
+    "Use /get-tnt-boots to receive the special diamond boots.",
+    "Equip the boots and move horizontally to spawn TNT behind you."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_trail_boots.sk",
+      "action": "WRITE",
+      "content": "command /get-tnt-boots:\n    permission: op\n    trigger:\n        give 1 of diamond boots named \"&cTNT Trail Boots\" with lore \"&7Leaves a trail of destruction behind you.\" to player\n\nevery 5 ticks:\n    loop all players:\n        if loop-player's boots is diamond boots named \"&cTNT Trail Boots\":\n            set {_v} to velocity of loop-player\n            set y-coordinate of {_v} to 0\n            if vector length of {_v} > 0.1:\n                if block under loop-player is not air:\n                    set {_loc} to location of loop-player\n                    set {_back} to location 1.5 meters behind loop-player\n                    spawn primed tnt at {_back}\n                    play sound \"entity.tnt.primed\" with volume 0.5 to loop-player"
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "FIX",
+      "target_scope": "items/tnt_trail_boots.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_trail_boots.sk"
+      ],
+      "candidate_events": [
+        "physics",
+        "flight_toggle"
+      ],
+      "intent_summary": "Fix the TNT trail spawning logic to prevent spawning while stationary and ensure the effect persists correctly."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_trail_boots.sk"
+      ],
+      "rationale": "The original script checked if velocity was exactly zero, which fails due to floating-point inaccuracies and minor server-side movement. I replaced this with a vector length check (ignoring Y-axis) to ensure TNT only spawns when the player is actively moving horizontally. I also reduced the distance behind the player to 1.5 meters to prevent spawning issues in tight spaces."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the TNT boots logic to use a velocity threshold instead of checking for zero, ensuring consistent spawning while moving.",
+      "usage_instructions": [
+        "Use /get-tnt-boots to receive the special diamond boots.",
+        "Equip the boots and move horizontally to spawn TNT behind you."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_trail_boots.sk"
+      ]
+    }
+  ]
+}

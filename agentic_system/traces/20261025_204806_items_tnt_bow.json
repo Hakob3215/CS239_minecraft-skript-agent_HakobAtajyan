@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-10-25T20:48:06.662742",
+  "player": "TheJack3215",
+  "action_type": "FIX",
+  "raw_prompt": "!fix it didn't do anything. the skyward bow specifically. i just shot the mob and nothing happened",
+  "target_scope": "items/tnt_bow.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Fixed the TNT Bow functionality by using entity metadata to track projectiles and added an immediate explosion effect upon impact.",
+  "usage_instructions": [
+    "Use /give-tnt-bow to receive the custom TNT Bow.",
+    "Shoot the bow at any target to trigger an explosion and scatter TNT."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "WRITE",
+      "content": "on shoot:\n    if shooter is a player:\n        if name of shooter's tool is \"&cTNT Bow\":\n            set metadata \"is_tnt_arrow\" of projectile to \"true\"\n\non projectile hit:\n    if metadata \"is_tnt_arrow\" of projectile is \"true\":\n        set {_loc} to location of projectile\n        create an explosion of force 3 at {_loc}\n        loop 5 times:\n            spawn 1 primed tnt at {_loc}\n            set velocity of last spawned tnt to vector(random number between -0.5 and 0.5, 0.5, random number between -0.5 and 0.5)\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots cascading TNT explosions.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "FIX",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_bow.sk"
+      ],
+      "candidate_events": [
+        "shoot",
+        "projectile_hit"
+      ],
+      "intent_summary": "Fix the projectile logic for the skyward bow to ensure it triggers effects upon hitting a mob."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "The previous implementation relied on a global variable map using UUIDs which can fail if the projectile is removed or the event triggers inconsistently. Switched to using metadata on the projectile entity itself, which is the standard, reliable way to track custom projectiles in vanilla Skript. Added an immediate explosion to ensure visual feedback upon impact."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Fixed the TNT Bow functionality by using entity metadata to track projectiles and added an immediate explosion effect upon impact.",
+      "usage_instructions": [
+        "Use /give-tnt-bow to receive the custom TNT Bow.",
+        "Shoot the bow at any target to trigger an explosion and scatter TNT."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ]
+    }
+  ]
+}

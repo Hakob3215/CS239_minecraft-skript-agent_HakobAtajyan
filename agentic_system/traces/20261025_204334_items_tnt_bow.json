@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-25T20:43:34.334508",
+  "player": "TheJack3215",
+  "action_type": "UPDATE",
+  "raw_prompt": "!update make the tnt bow spawn a lot more. like 100 total",
+  "target_scope": "items/tnt_bow.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the TNT Bow to spawn 100 TNT entities instantly upon impact instead of 10.",
+  "usage_instructions": [
+    "Use /give-tnt-bow to receive the upgraded TNT Bow.",
+    "Shoot the bow at a block to trigger 100 explosive TNT entities."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "WRITE",
+      "content": "on shoot:\n    if shooter is a player:\n        if name of shooter's tool is \"&cTNT Bow\":\n            set {_uuid} to uuid of projectile\n            set {tnt_arrow::%{_uuid}%} to true\n\non projectile hit:\n    if {tnt_arrow::%uuid of projectile%} is true:\n        delete {tnt_arrow::%uuid of projectile%}\n        set {_loc} to location of projectile\n        loop 100 times:\n            spawn 1 primed tnt at {_loc}\n            set velocity of last spawned tnt to vector(random number between -0.8 and 0.8, 0.8, random number between -0.8 and 0.8)\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots cascading TNT explosions.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "UPDATE",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_bow.sk"
+      ],
+      "candidate_events": [
+        "shoot"
+      ],
+      "intent_summary": "Increase the quantity of TNT spawned by the TNT bow to 100 projectiles."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "Updated the loop count from 10 to 100 to meet the player's request. Removed the 'wait' inside the loop to ensure all 100 TNT entities spawn instantly upon impact, preventing potential server lag from long-running loops and ensuring the explosion effect is immediate."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the TNT Bow to spawn 100 TNT entities instantly upon impact instead of 10.",
+      "usage_instructions": [
+        "Use /give-tnt-bow to receive the upgraded TNT Bow.",
+        "Shoot the bow at a block to trigger 100 explosive TNT entities."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-25T20:44:48.526768",
+  "player": "TheJack3215",
+  "action_type": "UPDATE",
+  "raw_prompt": "!update make the tnt bow still spawn 100, but add like 1 tick of delay every 5 tnt or so",
+  "target_scope": "items/tnt_bow.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Updated the TNT Bow to spawn 100 TNT in batches of 5 with a 1-tick delay between batches to improve performance.",
+  "usage_instructions": [
+    "Use /give-tnt-bow to receive the special TNT Bow.",
+    "Shoot an arrow to trigger the cascading 100 TNT explosion effect."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_bow.sk",
+      "action": "WRITE",
+      "content": "on shoot:\n    if shooter is a player:\n        if name of shooter's tool is \"&cTNT Bow\":\n            set {_uuid} to uuid of projectile\n            set {tnt_arrow::%{_uuid}%} to true\n\non projectile hit:\n    if {tnt_arrow::%uuid of projectile%} is true:\n        delete {tnt_arrow::%uuid of projectile%}\n        set {_loc} to location of projectile\n        set {_count} to 0\n        loop 100 times:\n            spawn 1 primed tnt at {_loc}\n            set velocity of last spawned tnt to vector(random number between -0.8 and 0.8, 0.8, random number between -0.8 and 0.8)\n            add 1 to {_count}\n            if {_count} is 5:\n                set {_count} to 0\n                wait 1 tick\n        delete projectile\n\ncommand /give-tnt-bow:\n    permission: op\n    trigger:\n        give player a bow named \"&cTNT Bow\" with lore \"&7Shoots cascading TNT explosions.\""
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "UPDATE",
+      "target_scope": "items/tnt_bow.sk",
+      "is_new_file": false,
+      "files_loaded": [
+        "items/tnt_bow.sk"
+      ],
+      "candidate_events": [
+        "shoot"
+      ],
+      "intent_summary": "Modify the TNT bow to spawn 100 TNT with a 1-tick delay interval every 5 TNT spawned."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_bow.sk"
+      ],
+      "rationale": "I implemented a counter variable {_count} inside the loop. Every time 5 TNT are spawned, the script resets the counter and executes a 'wait 1 tick' command to introduce the requested delay while maintaining the total count of 100 TNT."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Updated the TNT Bow to spawn 100 TNT in batches of 5 with a 1-tick delay between batches to improve performance.",
+      "usage_instructions": [
+        "Use /give-tnt-bow to receive the special TNT Bow.",
+        "Shoot an arrow to trigger the cascading 100 TNT explosion effect."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_bow.sk"
+      ]
+    }
+  ]
+}

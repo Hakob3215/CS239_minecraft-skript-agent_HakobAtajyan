@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-10-25T21:04:53.107116",
+  "player": "TheJack3215",
+  "action_type": "CREATE",
+  "raw_prompt": "!create add boots that when I walk it spawns primed tnt behind me (like 2 blocks behind, so a trail)",
+  "target_scope": "items/tnt_trail_boots.sk",
+  "success": true,
+  "compiler_error": null,
+  "reviewer_feedback": "Created custom diamond boots that spawn a trail of primed TNT behind the player while walking.",
+  "usage_instructions": [
+    "Use /get-tnt-boots as an operator to receive the special boots.",
+    "Equip the 'TNT Trail Boots' to start spawning TNT behind you.",
+    "Walk around to leave a trail of primed TNT in your wake."
+  ],
+  "retry_count": 0,
+  "mutations": [
+    {
+      "path": "items/tnt_trail_boots.sk",
+      "action": "CREATE",
+      "content": "command /get-tnt-boots:\n    permission: op\n    trigger:\n        give 1 of diamond boots named \"&cTNT Trail Boots\" with lore \"&7Leaves a trail of destruction behind you.\" to player\n\nevery 5 ticks:\n    loop all players:\n        if loop-player's boots is diamond boots named \"&cTNT Trail Boots\":\n            if block under loop-player is not air:\n                set {_loc} to location of loop-player\n                set {_back} to location 2 meters behind loop-player\n                spawn primed tnt at {_back}\n                play sound \"entity.tnt.primed\" with volume 0.5 to loop-player"
+    }
+  ],
+  "traces": [
+    {
+      "node": "secretary",
+      "action_type": "CREATE",
+      "target_scope": "items/tnt_trail_boots.sk",
+      "is_new_file": true,
+      "files_loaded": [],
+      "candidate_events": [
+        "physics"
+      ],
+      "intent_summary": "Create a custom boot item that spawns primed TNT behind the player as they walk."
+    },
+    {
+      "node": "swe",
+      "mutations_count": 1,
+      "files_modified": [
+        "items/tnt_trail_boots.sk"
+      ],
+      "rationale": "I created a script that checks every 5 ticks if a player is wearing the specific custom boots. If they are, it calculates a location 2 meters behind the player and spawns a primed TNT entity there. I used a command to allow the user to obtain the item, identifying it by its specific name and type."
+    },
+    {
+      "node": "reviewer",
+      "status": "APPROVED",
+      "user_summary": "Created custom diamond boots that spawn a trail of primed TNT behind the player while walking.",
+      "usage_instructions": [
+        "Use /get-tnt-boots as an operator to receive the special boots.",
+        "Equip the 'TNT Trail Boots' to start spawning TNT behind you.",
+        "Walk around to leave a trail of primed TNT in your wake."
+      ],
+      "applied_files": [
+        "WRITE:items/tnt_trail_boots.sk"
+      ]
+    }
+  ]
+}
