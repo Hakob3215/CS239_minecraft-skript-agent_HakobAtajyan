@@ -1,0 +1,24 @@
+[project]
+name = "minecraft-skript-agent"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Hakob", email = "hatajyan@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-core>=1.7.0",
+    "langchain-google-genai>=4.4.2",
+    "langgraph>=1.2.16",
+    "pydantic>=2.14.1",
+    "python-dotenv>=1.2.4",
+    "watchdog>=6.0.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "agent_system"
+module-root = "."
