@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+import re
 from typing import Any, Dict, List
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,7 +12,22 @@ from agent_system.state import AgentState, FileMutation
 
 load_dotenv()
 
-# Container model for SWE output
+# ==============================================================================
+# MODEL CONFIGURATION
+# Set to True for near-instant execution (gemini-3.1-flash-lite)
+# Set to False for deep reasoning / high-fidelity syntax (gemini-3.8-flash)
+# ==============================================================================
+USE_FLASH_LITE = True
+
+SWE_MODEL = os.getenv(
+    "SWE_MODEL",
+    "gemini-3.1-flash-lite" if USE_FLASH_LITE else "gemini-3.8-flash"
+)
+
+# Regex to capture the exact offending line from Skript's compiler output
+OFFENDING_LINE_REGEX = re.compile(r"Line:\s*(.+)", re.IGNORECASE)
+
+
 class SweResult(BaseModel):
     mutations: List[FileMutation] = Field(
         ...,
@@ -34,7 +51,7 @@ ENVIRONMENT CONSTRAINTS:
      * Check name: if name of player's tool is "&6Fire Staff":
      * Check armor slot: if name of player's chestplate is "&bTeleport Elytra":
      * Check type + name: if player's tool is a diamond sword: if name of player's tool is "&cExcalibur":
-     
+
 CRITICAL SYNTAX & FORMATTING RULES:
 1. INDENTATION IS MANDATORY: Skript syntax is whitespace-sensitive. Every block following a colon (:) MUST be on a new line indented with exactly 4 spaces. NEVER combine statements on a single line.
 2. MULTI-FILE ARCHITECTURE: If target_scope is a directory, emit clean, modular files with clear responsibilities. Ensure shared variables (e.g., {{spellbook::*}}) and function signatures match across sibling files.
@@ -46,9 +63,12 @@ Relevant Skript Syntax Documentation retrieved for this task:
 """
 
 SWE_USER_PROMPT = """TASK CONTEXT:
-- Action Type: {action_type}
-- Target Scope: {target_scope}
-- Advisory Event Candidates: {candidate_events}
+- Action Type: 
+{action_type}
+- Target Scope: 
+{target_scope}
+- Advisory Event Candidates: 
+{candidate_events}
 
 EXISTING WORKSPACE FILES IN SCOPE:
 {workspace_context}
@@ -79,14 +99,20 @@ def swe_node(state: AgentState) -> Dict[str, Any]:
     """
     retriever = DocRetriever()
 
-    # 1. Dynamically retrieve syntax patterns based on prompt and candidate events
-    query_terms = [state.raw_prompt] + state.candidate_events
+    # 1. Determine search terms
     if state.compiler_error:
-        query_terms.append(state.compiler_error)
-    search_query = " ".join(query_terms)
+        # Extract the specific line of code that failed compilation
+        matched_lines = OFFENDING_LINE_REGEX.findall(state.compiler_error)
+        failing_code = " ".join(matched_lines) if matched_lines else ""
+        
+        # Prioritize the broken code line over the original prompt
+        search_query = f"{failing_code} {' '.join(state.candidate_events)} {state.raw_prompt}"
+    else:
+        # Standard clean run: prompt + candidate events
+        search_query = f"{state.raw_prompt} {' '.join(state.candidate_events)}"
 
-    # Fetch relevant documentation from SQLite FTS5
-    retrieved_docs = retriever.format_for_prompt(search_query, limit=5)
+    # Fetch relevant documentation from SQLite FTS5 (capped at 3 to prevent token bloating)
+    retrieved_docs = retriever.format_for_prompt(search_query, limit=3)
 
     # 2. Build prompts
     prompt = ChatPromptTemplate.from_messages([
@@ -96,8 +122,9 @@ def swe_node(state: AgentState) -> Dict[str, Any]:
 
     # 3. Initialize model with structured schema
     llm = ChatGoogleGenerativeAI(
-        model="gemini-3.1-flash-lite",
+        model=SWE_MODEL,
         temperature=0.1,
+        max_retries=3,
     )
     structured_llm = llm.with_structured_output(SweResult)
 
@@ -116,6 +143,7 @@ def swe_node(state: AgentState) -> Dict[str, Any]:
 
     trace_entry = {
         "node": "swe",
+        "model_used": SWE_MODEL,
         "mutations_count": len(result.mutations),
         "files_modified": [m.path for m in result.mutations],
         "rationale": result.rationale,
