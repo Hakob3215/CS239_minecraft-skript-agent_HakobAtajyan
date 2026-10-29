@@ -18,7 +18,7 @@ The application interprets the request, identifies the relevant Skript file, ret
 
 | Rubric Deliverable | Repository Location | Description |
 | :--- | :--- | :--- |
-| **Demo Video** | [YouTube (5 min)](https://www.youtube.com/watch?v=Kr84olc-k2k) | Video demonstration of architecture, live chat triggers, self-healing, and traces. |
+| **Demo Video** | [YouTube (5 min)](https://www.youtube.com/watch?v=Kr84olc-k2k) | Video demo of functionality + overall architecture. |
 | **Application Overview** | `submission/requirements/minecraft-skript-agent/app.md` | Core purpose, live server architecture, and supported in-game commands. |
 | **System Policies** | `submission/requirements/minecraft-skript-agent/policy.md` | Application policies covering sandboxing, command blacklists, and compiler gates. |
 | **Tool Manifest** | `submission/requirements/minecraft-skript-agent/tools.md` | Signatures, inputs, and outputs for all FTS5, RCON, file, and broadcast tools. |
