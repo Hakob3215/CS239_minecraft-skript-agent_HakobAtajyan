@@ -7,3 +7,14 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+agent_system/traces/*.json
+agent_system/.venv/
+mc_server/
+mc_server/cache/
+mc_server/libraries/
+mc_server/logs/
+mc_server/versions/
+mc_server/world*/
+mc_server/.paper-remapped/
+mc_server/plugins/Skript/backups/
+mc_server/plugins/bStats/
